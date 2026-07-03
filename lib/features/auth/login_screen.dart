@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../dashboard/dashboard_screen.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -12,6 +12,56 @@ class _LoginScreenState extends State<LoginScreen> {
   final passwordController = TextEditingController();
 
   bool obscurePassword = true;
+  bool isLoading = false;
+
+void login() async {
+  final email = emailController.text.trim();
+  final password = passwordController.text;
+
+  if (email.isEmpty || password.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Please enter your email and password."),
+      ),
+    );
+    return;
+  }
+
+  if (!email.contains("@")) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Please enter a valid email address."),
+      ),
+    );
+    return;
+  }
+
+  if (password.length < 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Password must be at least 6 characters."),
+      ),
+    );
+    return;
+  }
+
+  setState(() {
+    isLoading = true;
+  });
+
+  await Future.delayed(const Duration(seconds: 2));
+
+  setState(() {
+    isLoading = false;
+  });
+
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const DashboardScreen(),
+    ),
+  );
+}
   @override
 void dispose() {
   emailController.dispose();
@@ -105,17 +155,27 @@ void dispose() {
                 SizedBox(
                   height: 55,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: isLoading ? null : login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0B3D91),
                     ),
-                    child: const Text(
-                      "SIGN IN",
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: isLoading
+    ? const SizedBox(
+        height: 24,
+        width: 24,
+        child: CircularProgressIndicator(
+          strokeWidth: 3,
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      )
+    : const Text(
+        "SIGN IN",
+        style: TextStyle(
+          fontSize: 18,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
                   ),
                 ),
               ],
