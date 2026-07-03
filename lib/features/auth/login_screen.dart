@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../../core/navigation/main_navigation.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -58,7 +59,7 @@ void login() async {
   Navigator.pushReplacement(
     context,
     MaterialPageRoute(
-      builder: (context) => const DashboardScreen(),
+      builder: (context) => const MainNavigation(),
     ),
   );
 }
