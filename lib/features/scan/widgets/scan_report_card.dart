@@ -7,7 +7,7 @@
 //
 // Author: Ab Junior
 // ==========================================================
-
+import 'protection_score_gauge.dart';
 import 'package:flutter/material.dart';
 import '../scan_engine.dart';
 
@@ -62,28 +62,49 @@ class ScanReportCard extends StatelessWidget {
 
             const SizedBox(height: 15),
 
-            Text(
-              "Protection Score: ${scanResult.protectionScore}%",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: scanResult.protectionScore >= 90
-                    ? Colors.green
-                    : scanResult.protectionScore >= 70
-                        ? Colors.orange
-                        : Colors.red,
-              ),
-            ),
+            const SizedBox(height: 15),
+
+Center(
+  child: ProtectionScoreGauge(
+    score: scanResult.protectionScore,
+  ),
+),
+
+const SizedBox(height: 20),
+            
 
             const SizedBox(height: 15),
 
-            Text(
+          Text(
+                          
               scanResult.status,
               style: const TextStyle(
                 fontSize: 16,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.bold,
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            ListTile(
+              leading: const Icon(Icons.verified_user, color: Colors.blue),
+              title: const Text("Security Level"),
+              subtitle: Text(scanResult.securityLevel),
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.lightbulb_outline, color: Colors.orange),
+              title: const Text("Recommendation"),
+              subtitle: Text(scanResult.recommendation),
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.access_time, color: Colors.green),
+              title: const Text("Last Scan"),
+              subtitle: Text(scanResult.scanTime.toString()),
+            ),
+              
+      
           ],
         ),
       ),

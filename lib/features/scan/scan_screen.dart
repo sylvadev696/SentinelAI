@@ -11,6 +11,7 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
+
 import 'scan_engine.dart';
 import 'widgets/scan_report_card.dart';
 
@@ -22,7 +23,6 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-
   // ==========================================================
   // SCAN STATE VARIABLES
   // ==========================================================
@@ -30,19 +30,14 @@ class _ScanScreenState extends State<ScanScreen> {
   bool isScanning = false;
   double progress = 0.0;
 
-  // Stores the latest completed scan.
+  // Stores the latest completed scan
   ScanResult? scanResult;
 
   // ==========================================================
   // START DEVICE SCAN
-  //
-  // Simulates a real antivirus scan using a timer.
-  // Updates the progress bar and generates a
-  // dynamic security report when finished.
   // ==========================================================
 
   void startScan() {
-
     setState(() {
       isScanning = true;
       progress = 0.0;
@@ -52,13 +47,11 @@ class _ScanScreenState extends State<ScanScreen> {
     Timer.periodic(
       const Duration(milliseconds: 200),
       (timer) {
-
         setState(() {
           progress += 0.05;
         });
 
         if (progress >= 1.0) {
-
           timer.cancel();
 
           final result = ScanEngine.performScan();
@@ -70,11 +63,9 @@ class _ScanScreenState extends State<ScanScreen> {
           });
 
           ScaffoldMessenger.of(context).showSnackBar(
-
             SnackBar(
               content: Text(result.status),
             ),
-
           );
         }
       },
@@ -87,27 +78,22 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       appBar: AppBar(
         title: const Text("Device Scanner"),
         backgroundColor: const Color(0xFF0B3D91),
         foregroundColor: Colors.white,
       ),
 
-      body: Center(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
 
-        child: Padding(
-
-          padding: const EdgeInsets.all(24),
-
+        child: Center(
           child: Column(
-
-            mainAxisAlignment: MainAxisAlignment.center,
-
             children: [
+              const SizedBox(height: 20),
 
+              // Shield Icon
               const Icon(
                 Icons.shield_rounded,
                 size: 100,
@@ -116,12 +102,9 @@ class _ScanScreenState extends State<ScanScreen> {
 
               const SizedBox(height: 30),
 
+              // Scan Title
               Text(
-
-                isScanning
-                    ? "Scanning..."
-                    : "Ready to Scan",
-
+                isScanning ? "Scanning..." : "Ready to Scan",
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -135,7 +118,6 @@ class _ScanScreenState extends State<ScanScreen> {
               // ==================================================
 
               if (isScanning) ...[
-
                 LinearProgressIndicator(
                   value: progress,
                   minHeight: 8,
@@ -159,11 +141,7 @@ class _ScanScreenState extends State<ScanScreen> {
               // ==================================================
 
               ElevatedButton.icon(
-
-                onPressed:
-                    isScanning
-                        ? null
-                        : startScan,
+                onPressed: isScanning ? null : startScan,
 
                 icon: const Icon(Icons.play_arrow),
 
@@ -190,16 +168,15 @@ class _ScanScreenState extends State<ScanScreen> {
               // ==================================================
 
               if (scanResult != null)
-
-                ScanReportCard(scanResult: scanResult!,
+                ScanReportCard(
+                  scanResult: scanResult!,
                 ),
 
+              const SizedBox(height: 30),
             ],
           ),
         ),
       ),
     );
-        
-          
   }
 }
