@@ -21,7 +21,7 @@ class ActivityTile extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: iconColor.withOpacity(0.15),
+          backgroundColor: iconColor.withValues(alpha: 0.15),
           child: Icon(
             icon,
             color: iconColor,
