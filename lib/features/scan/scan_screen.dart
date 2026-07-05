@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 
 import 'scan_engine.dart';
 import 'widgets/scan_report_card.dart';
+import '../../services/latest_scan_service.dart';  
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -61,6 +62,8 @@ class _ScanScreenState extends State<ScanScreen> {
             isScanning = false;
             scanResult = result;
           });
+          //save the latest scan result to the service
+          LatestScanService.saveScan(result);
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
