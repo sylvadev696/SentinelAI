@@ -4,6 +4,7 @@ import '../../features/dashboard/dashboard_screen.dart';
 import '../../features/scan/scan_screen.dart';
 import '../../features/activity/activity_screen.dart';
 import '../../features/profile/profile_screen.dart';
+import '../../features/analytics/analytics_screen.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -18,6 +19,7 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     ScanScreen(),
+    AnalyticsScreen(),
     ActivityScreen(),
     ProfileScreen(),
   ];
@@ -49,7 +51,10 @@ class _MainNavigationState extends State<MainNavigation> {
             icon: Icon(Icons.security),
             label: "Scan",
           ),
-
+          BottomNavigationBarItem(
+            icon: Icon(Icons.analytics),
+            label: "Analytics",
+          ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bar_chart),
             label: "Activity",

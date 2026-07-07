@@ -3,8 +3,10 @@
 // File: latest_scan_service.dart
 //
 // Description:
-// Stores the latest completed scan so multiple screens
-// can access the same information.
+// Stores only the most recent completed scan.
+//
+// Permanent scan history is handled by
+// ActivityStorageService.
 //
 // Author: Ab Junior
 // ==========================================================
@@ -13,20 +15,27 @@ import '../features/scan/scan_engine.dart';
 
 class LatestScanService {
 
-  static ScanResult? latestScan;
+  // ==========================================================
+  // LATEST SCAN
+  // ==========================================================
 
-  static final List<ScanResult> scanHistory = [];
+  static ScanResult? _latestScan;
 
-  static void saveScan(ScanResult result) {
-    latestScan = result;
-    scanHistory.insert(0, result); // newest first
+  // ==========================================================
+  // SAVE LATEST SCAN
+  // ==========================================================
+
+  static void saveScan(
+    ScanResult result,
+  ) {
+    _latestScan = result;
   }
+
+  // ==========================================================
+  // GET LATEST SCAN
+  // ==========================================================
 
   static ScanResult? getLatestScan() {
-    return latestScan;
-  }
-
-  static List<ScanResult> getHistory() {
-    return scanHistory;
+    return _latestScan;
   }
 }

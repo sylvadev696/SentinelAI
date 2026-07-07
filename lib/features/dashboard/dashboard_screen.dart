@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/latest_scan_service.dart';
 import '../scan/scan_engine.dart';
+import 'widgets/protection_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -100,88 +101,16 @@ class DashboardScreen extends StatelessWidget {
             // PROTECTION CARD
             // ==================================================
 
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-
-                child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
-
-                  children: [
-
-                    Row(
-                      children: [
-
-                        CircleAvatar(
-                          backgroundColor:
-                              latestScan == null
-                                  ? Colors.grey
-                                  : latestScan.protectionScore >= 90
-                                      ? Colors.green
-                                      : latestScan.protectionScore >= 70
-                                          ? Colors.orange
-                                          : Colors.red,
-
-                          child: const Icon(
-                            Icons.verified_user,
-                            color: Colors.white,
-                          ),
-                        ),
-
-                        const SizedBox(width: 15),
-
-                        const Text(
-                          "Protection Status",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    Text(
-                      latestScan == null
-                          ? "No Scan Yet"
-                          : latestScan.securityLevel,
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      latestScan == null
-                          ? "Run your first security scan."
-                          : latestScan.recommendation,
-                    ),
-
-                    if (latestScan != null) ...[
-                      const SizedBox(height: 15),
-
-                      Text(
-                        "Protection Score: ${latestScan.protectionScore}%",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
+            ProtectionCard(
+              protectionScore: latestScan?.protectionScore ?? 0,
+              securityLevel: latestScan?.securityLevel ?? "No Scan Yet",
+              recommendation: latestScan?.recommendation ??
+                  "Run your first security scan to begin protecting your device.",
             ),
 
             const SizedBox(height: 30),
+                            
+                    
 
             // ==================================================
             // QUICK ACTIONS

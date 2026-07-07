@@ -6,6 +6,11 @@
 // Displays the device scanner screen, performs a simulated
 // security scan, and presents a dynamic security report.
 //
+// Every completed scan is:
+// • Displayed on this screen
+// • Saved as the latest scan
+// • Stored permanently in Activity History
+//
 // Author: Ab Junior
 // ==========================================================
 
@@ -14,7 +19,8 @@ import 'package:flutter/material.dart';
 
 import 'scan_engine.dart';
 import 'widgets/scan_report_card.dart';
-import '../../services/latest_scan_service.dart';  
+import '../../services/latest_scan_service.dart';
+import '../../services/activity_storage_service.dart';
 
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
@@ -38,7 +44,7 @@ class _ScanScreenState extends State<ScanScreen> {
   // START DEVICE SCAN
   // ==========================================================
 
-  void startScan() {
+  Future<void> startScan() async {
     setState(() {
       isScanning = true;
       progress = 0.0;
@@ -47,7 +53,7 @@ class _ScanScreenState extends State<ScanScreen> {
 
     Timer.periodic(
       const Duration(milliseconds: 200),
-      (timer) {
+      (timer) async {
         setState(() {
           progress += 0.05;
         });
@@ -61,9 +67,24 @@ class _ScanScreenState extends State<ScanScreen> {
             progress = 1.0;
             isScanning = false;
             scanResult = result;
-          });
-          //save the latest scan result to the service
+          }); 
+
+          // ==================================================
+          // SAVE SCAN INFORMATION
+          //
+          // Save the latest scan for the Dashboard and
+          // permanently store it in Activity History.
+          // ==================================================
+
           LatestScanService.saveScan(result);
+
+          await ActivityStorageService.saveScan(result);
+
+          // ==================================================
+          // SHOW COMPLETION MESSAGE
+          // ==================================================
+
+          if (!mounted) return;
 
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -87,10 +108,8 @@ class _ScanScreenState extends State<ScanScreen> {
         backgroundColor: const Color(0xFF0B3D91),
         foregroundColor: Colors.white,
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
-
         child: Center(
           child: Column(
             children: [
@@ -145,15 +164,12 @@ class _ScanScreenState extends State<ScanScreen> {
 
               ElevatedButton.icon(
                 onPressed: isScanning ? null : startScan,
-
                 icon: const Icon(Icons.play_arrow),
-
                 label: Text(
                   isScanning
                       ? "SCANNING..."
                       : "START SCAN",
                 ),
-
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF0B3D91),
                   foregroundColor: Colors.white,
