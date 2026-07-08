@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import '../../services/activity_storage_service.dart';
 import '../scan/scan_engine.dart';
 import '../../services/activity_time_service.dart';
+import 'widgets/search_bar_widget.dart';
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
 
@@ -37,7 +38,32 @@ class _ActivityScreenState
 
   bool isLoading = true;
 
-  List<ScanResult> history = [];
+// ==========================================================
+// ALL SAVED SCANS
+// ==========================================================
+
+List<ScanResult> history = [];
+
+// ==========================================================
+// SEARCH CONTROLLER
+// ==========================================================
+
+final TextEditingController searchController =
+    TextEditingController();
+
+
+void searchHistory(String value){
+  // We implement the search logic in the next phase.
+}
+
+
+// ==========================================================
+// FILTERED SCANS
+// ==========================================================
+
+List<ScanResult> filteredHistory = [];
+
+
 
   // ==========================================================
   // INITIALIZE SCREEN
@@ -66,6 +92,7 @@ class _ActivityScreenState
 
     setState(() {
       history = scans;
+      filteredHistory = scans;
       isLoading = false;
     });
   }
@@ -82,12 +109,29 @@ class _ActivityScreenState
     backgroundColor: const Color(0xFF0B3D91),
     foregroundColor: Colors.white,
   ),
+  body: Column(
+  children: [
 
-  // ==========================================================
-  // BODY
-  // ==========================================================
+    // ==========================================================
+    // SEARCH BAR
+    // ==========================================================
 
-  body: isLoading
+    Padding(
+      padding: EdgeInsets.all(16),
+      child: SearchBarWidget(
+        controller: searchController,
+        onChanged: searchHistory,
+      ),
+    ),
+
+    // ==========================================================
+    // HISTORY LIST
+    // ==========================================================
+
+    Expanded(
+      child: isLoading
+
+  
 
       // ======================================================
       // LOADING STATE
@@ -197,7 +241,10 @@ final exactTime =
                 );
               },
             ),
-);
+    ),
+ ]
+  )
+  );
          
  }
 // ==========================================================

@@ -21,7 +21,7 @@ void login() async {
   if (email.isEmpty || password.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Please enter your email and password."),
+        content: Text("Please enter valid email and password."),
       ),
     );
     return;
@@ -36,10 +36,10 @@ void login() async {
     return;
   }
 
-  if (password.length < 6) {
+  if (password.length < 10) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Password must be at least 6 characters."),
+        content: Text("Password must be at least 10 characters."),
       ),
     );
     return;
