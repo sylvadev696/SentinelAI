@@ -43,28 +43,56 @@ class _ActivityScreenState
 // ==========================================================
 
 List<ScanResult> history = [];
-
-// ==========================================================
-// SEARCH CONTROLLER
-// ==========================================================
-
-final TextEditingController searchController =
-    TextEditingController();
-
-
-void searchHistory(String value){
-  // We implement the search logic in the next phase.
-}
-
-
-// ==========================================================
-// FILTERED SCANS
-// ==========================================================
-
+final TextEditingController searchController = TextEditingController();
 List<ScanResult> filteredHistory = [];
 
+// ==========================================================
+// SEARCH HISTORY
+//
+// Filters scan history in real-time.
+//
+// Search matches:
+//
+// • Security Level
+// • Status
+// • Protection Score
+// ==========================================================
 
+void searchHistory(String value) {
 
+  final query = value.toLowerCase().trim();
+
+  setState(() {
+
+    if (query.isEmpty) {
+
+      filteredHistory = history;
+
+      return;
+    }
+
+    filteredHistory = history.where((scan) {
+
+      return scan.securityLevel
+              .toLowerCase()
+              .contains(query)
+
+          ||
+
+          scan.status
+              .toLowerCase()
+              .contains(query)
+
+          ||
+
+          scan.protectionScore
+              .toString()
+              .contains(query);
+
+    }).toList();
+
+  });
+}
   // ==========================================================
   // INITIALIZE SCREEN
   // ==========================================================
@@ -96,6 +124,7 @@ List<ScanResult> filteredHistory = [];
       isLoading = false;
     });
   }
+
 
   // ==========================================================
   // USER INTERFACE
@@ -145,7 +174,7 @@ List<ScanResult> filteredHistory = [];
       // EMPTY HISTORY
       // ======================================================
 
-      : history.isEmpty
+      : filteredHistory.isEmpty
 
           ? const Center(
               child: Padding(
@@ -164,7 +193,7 @@ List<ScanResult> filteredHistory = [];
                     SizedBox(height: 20),
 
                     Text(
-                      "No Scan History",
+                      "No Matching results",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -174,7 +203,7 @@ List<ScanResult> filteredHistory = [];
                     SizedBox(height: 10),
 
                     Text(
-                      "Run your first security scan.\nYour completed scans will appear here.",
+                      "No scan Matched your search.\nTry another keyword.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.grey,
@@ -192,10 +221,10 @@ List<ScanResult> filteredHistory = [];
 
           : ListView.builder(
               padding: const EdgeInsets.all(16),
-              itemCount: history.length,
+              itemCount: filteredHistory.length,
               itemBuilder: (context, index) {
 
-                final scan = history[index];
+                final scan = filteredHistory[index];
 // ==========================================================
 // FORMATTED ACTIVITY TIME
 // ==========================================================
