@@ -12,7 +12,7 @@
 // • Loading indicator
 // • Enterprise architecture
 //
-// Author: Ab Junior
+// Author: Aju Sylvanus Aburu
 // ==========================================================
 
 import 'package:flutter/material.dart';
@@ -21,6 +21,7 @@ import '../../services/activity_storage_service.dart';
 import '../scan/scan_engine.dart';
 import '../../services/activity_time_service.dart';
 import 'widgets/search_bar_widget.dart';
+import 'widgets/filter_chip_widget.dart';
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
 
@@ -45,6 +46,8 @@ class _ActivityScreenState
 List<ScanResult> history = [];
 final TextEditingController searchController = TextEditingController();
 List<ScanResult> filteredHistory = [];
+
+String selectedFilter = "All";
 
 // ==========================================================
 // SEARCH HISTORY
@@ -91,6 +94,43 @@ void searchHistory(String value) {
 
     }).toList();
 
+  });
+}
+// ==========================================================
+// APPLY FILTER
+// ==========================================================
+
+void applyFilter(String filter) {
+
+  setState(() {
+
+    selectedFilter = filter;
+
+    switch (filter) {
+
+      case "Safe":
+        filteredHistory = history
+            .where((scan) => scan.protectionScore >= 90)
+            .toList();
+        break;
+
+      case "Warning":
+        filteredHistory = history
+            .where((scan) =>
+                scan.protectionScore >= 70 &&
+                scan.protectionScore < 90)
+            .toList();
+        break;
+
+      case "Critical":
+        filteredHistory = history
+            .where((scan) => scan.protectionScore < 70)
+            .toList();
+        break;
+
+      default:
+        filteredHistory = history;
+    }
   });
 }
   // ==========================================================
@@ -152,6 +192,52 @@ void searchHistory(String value) {
         onChanged: searchHistory,
       ),
     ),
+// ==========================================================
+// FILTER CHIPS
+// ==========================================================
+
+Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: Row(
+      children: [
+
+        FilterChipWidget(
+          label: "All",
+          selected: selectedFilter == "All",
+          onTap: () => applyFilter("All"),
+        ),
+
+        const SizedBox(width: 8),
+
+        FilterChipWidget(
+          label: "Safe",
+          selected: selectedFilter == "Safe",
+          onTap: () => applyFilter("Safe"),
+        ),
+
+        const SizedBox(width: 8),
+
+        FilterChipWidget(
+          label: "Warning",
+          selected: selectedFilter == "Warning",
+          onTap: () => applyFilter("Warning"),
+        ),
+
+        const SizedBox(width: 8),
+
+        FilterChipWidget(
+          label: "Critical",
+          selected: selectedFilter == "Critical",
+          onTap: () => applyFilter("Critical"),
+        ),
+      ],
+    ),
+  ),
+),
+
+const SizedBox(height: 12),
 
     // ==========================================================
     // HISTORY LIST

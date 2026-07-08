@@ -13,37 +13,136 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool obscurePassword = true;
   bool isLoading = false;
+// ==========================================================
+// REAL-TIME VALIDATION
+// ==========================================================
 
+String? emailError;
+
+String? passwordError;
+// ==========================================================
+// INITIALIZE SCREEN
+// ==========================================================
+
+@override
+void initState() {
+  super.initState();
+
+  emailController.addListener(validateInputs);
+  passwordController.addListener(validateInputs);
+}
+// ==========================================================
+// EMAIL VALIDATION
+//
+// Accepts only supported email providers.
+//
+// Supported:
+//
+// • Gmail
+// • Outlook
+// • Hotmail
+// • Yahoo
+// • Live
+// • iCloud
+// • Proton
+// ==========================================================
+
+bool isValidEmail(String email) {
+
+  final emailRegex = RegExp(
+    r'^[A-Za-z0-9._%+-]+@(gmail\.com|outlook\.com|hotmail\.com|yahoo\.com|live\.com|icloud\.com|proton\.me|protonmail\.com)$',
+    caseSensitive: false,
+  );
+
+  return emailRegex.hasMatch(email.trim());
+}
+// ==========================================================
+// PASSWORD VALIDATION
+//
+// Requirements:
+//
+// • Minimum 10 characters
+// • One uppercase letter
+// • One lowercase letter
+// • One number
+// • One special character
+// ==========================================================
+
+bool isValidPassword(String password) {
+
+  final passwordRegex = RegExp(
+    r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&^#()_+\-=\[\]{};:"\\|,.<>\/]).{10,}$',
+  );
+
+  return passwordRegex.hasMatch(password);
+}
+// ==========================================================
+// VALIDATE INPUTS
+//
+// Runs every time the user types.
+//
+// Updates the UI instantly.
+// ==========================================================
+
+void validateInputs() {
+
+  setState(() {
+
+    final email = emailController.text.trim();
+    final password = passwordController.text;
+
+    emailError = null;
+    passwordError = null;
+
+    if (email.isNotEmpty && !isValidEmail(email)) {
+      emailError = "Enter a valid email address!";
+    }
+
+    if (password.isNotEmpty &&
+        !isValidPassword(password)) {
+
+      passwordError =
+          "Must contain uppercase, lowercase,\nnumber and special character!";
+    }
+
+  });
+
+}
 void login() async {
   final email = emailController.text.trim();
   final password = passwordController.text;
 
+
   if (email.isEmpty || password.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text("Please enter valid email and password."),
+        content: Text("Please enter valid email and password!"),
       ),
     );
     return;
   }
 
-  if (!email.contains("@")) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Please enter a valid email address."),
+if (!isValidEmail(email)) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text(
+        "Please enter a valid domain address.",
       ),
-    );
-    return;
-  }
+    ),
+  );
+  return;
+}
 
-  if (password.length < 10) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Password must be at least 10 characters."),
+  if (!isValidPassword(password)) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text(
+        "Password must contain at least 10 characters, including uppercase, lowercase, number and special character.",
       ),
-    );
-    return;
-  }
+    ),
+  );
+  return;
+}
 
   setState(() {
     isLoading = true;
@@ -100,7 +199,7 @@ void dispose() {
                 const SizedBox(height: 20),
 
                 const Text(
-                  "Welcome Back",
+                  "Welcome....",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 30,
@@ -118,37 +217,86 @@ void dispose() {
                 const SizedBox(height: 35),
 
                 TextField(
-                  controller: emailController,
-                  decoration: const InputDecoration(
-                    labelText: "Email",
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                ),
+  controller: emailController,
+  keyboardType: TextInputType.emailAddress,
+  decoration: InputDecoration(
+    labelText: "Email",
+    border: const OutlineInputBorder(),
+    prefixIcon: const Icon(Icons.email),
+
+    // Shows validation error
+    errorText: emailError,
+
+    // Shows a green checkmark when valid
+    suffixIcon: emailController.text.isEmpty
+        ? null
+        : (emailError == null
+            ? const Icon(
+                Icons.check_circle,
+                color: Colors.green,
+              )
+            : const Icon(
+                Icons.error,
+                color: Colors.red,
+              )),
+  ),
+),
+ 
 
                 const SizedBox(height: 20),
 
                 TextField(
-                  controller: passwordController,
-                  obscureText: obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.lock),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        obscurePassword
-                            ? Icons.visibility
-                            : Icons.visibility_off,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          obscurePassword = !obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                ),
+  controller: passwordController,
+  obscureText: obscurePassword,
+
+  decoration: InputDecoration(
+    labelText: "Password",
+
+    border: const OutlineInputBorder(),
+
+    prefixIcon: const Icon(Icons.lock),
+
+    // Live validation message
+    errorText: passwordError,
+
+    suffixIcon: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+
+        // Validation icon
+        if (passwordController.text.isNotEmpty)
+
+          Icon(
+            passwordError == null
+                ? Icons.check_circle
+                : Icons.error,
+            color: passwordError == null
+                ? Colors.green
+                : Colors.red,
+          ),
+
+        IconButton(
+          icon: Icon(
+            obscurePassword
+                ? Icons.visibility
+                : Icons.visibility_off,
+          ),
+
+          onPressed: () {
+
+            setState(() {
+
+              obscurePassword =
+                  !obscurePassword;
+
+            });
+
+          },
+        ),
+      ],
+    ),
+  ),
+),
 
                 const SizedBox(height: 30),
 
