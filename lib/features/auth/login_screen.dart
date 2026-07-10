@@ -102,7 +102,7 @@ void validateInputs() {
         !isValidPassword(password)) {
 
       passwordError =
-          "Must contain uppercase, lowercase,\nnumber and special character!";
+          "Must be at least 10 characters\ncontain uppercase, lowercase,\nnumber and special character!";
     }
 
   });
@@ -150,16 +150,32 @@ if (!isValidEmail(email)) {
 
   await Future.delayed(const Duration(seconds: 2));
 
-  setState(() {
-    isLoading = false;
-  });
+  // ==========================================================
+// SHOW LOADING INDICATOR
+// ==========================================================
+setState(() {
+  isLoading = true;
+});
 
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const MainNavigation(),
-    ),
-  );
+// Simulate login request
+await Future.delayed(const Duration(seconds: 2));
+
+// If this widget has been removed from the widget tree,
+// stop executing to avoid using an invalid BuildContext.
+if (!mounted) return;
+
+// Hide loading indicator
+setState(() {
+  isLoading = false;
+});
+
+// Navigate to the main application
+Navigator.pushReplacement(
+  context,
+  MaterialPageRoute(
+    builder: (context) => const MainNavigation(),
+  ),
+);
 }
   @override
 void dispose() {

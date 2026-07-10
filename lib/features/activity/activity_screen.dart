@@ -425,7 +425,7 @@ Widget buildHistoryCard(
 
               CircleAvatar(
                 backgroundColor:
-                    statusColor.withOpacity(.15),
+                    statusColor.withValues(alpha: 0.15),
 
                 child: Icon(
                   statusIcon,
@@ -652,7 +652,7 @@ Widget buildHistoryCard(
             padding: const EdgeInsets.all(14),
 
             decoration: BoxDecoration(
-              color: statusColor.withOpacity(.08),
+              color: statusColor.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
 

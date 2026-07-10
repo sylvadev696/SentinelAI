@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'features/splash/splash_screen.dart';
+import 'package:sentinel_ai/features/auth/login_screen.dart';
 
 class SentinelApp extends StatelessWidget {
   const SentinelApp({super.key});
@@ -9,7 +9,7 @@ class SentinelApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Sentinel AI',
-      home: const SplashScreen(),
+      home: const LoginScreen(),
     );
   }
 }
