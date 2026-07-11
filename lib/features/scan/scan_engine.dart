@@ -14,7 +14,8 @@
 // Author: Ab Junior
 // ==========================================================
 
-import 'dart:math';
+
+import '../security/models/file_information.dart';
 
 // ==========================================================
 // SCAN RESULT MODEL
@@ -97,65 +98,118 @@ class ScanEngine {
   // SIMULATED SCAN
   // ==========================================================
 
-  static ScanResult performScan() {
-    final random = Random();
+ // ==========================================================
+// REAL FILE SCAN
+//
+// Performs a real scan using the files selected by
+// the user.
+//
+// Current detection:
+//
+// • Counts every scanned file
+// • Detects executable files
+// • Detects suspicious filenames
+//
+// Future improvements:
+//
+// • SHA-256 hashing
+// • Malware signature database
+// • AI threat classification
+// • Ransomware detection
+// • Cloud reputation lookup
+// ==========================================================
 
-    final apps = 120 + random.nextInt(81);
-    final files = 3000 + random.nextInt(4001);
-    final threats = random.nextInt(4);
+static Future<ScanResult> performRealScan(
+  List<FileInformation> files,
+) async {
 
-    int score = 100 - (threats * 15);
+  // ========================================================
+  // THREAT COUNTER
+  //
+  // Counts how many suspicious files are found.
+  // ========================================================
 
-    if (score < 40) score = 40;
+  int threats = 0;
 
-    final status = threats == 0
-        ? "Your device is secure."
-        : threats == 1
-            ? "Low-risk threat detected."
-            : threats == 2
-                ? "Multiple threats detected."
-                : "Critical security attention required.";
+  // ========================================================
+  // ANALYZE EVERY FILE
+  // ========================================================
 
-    final securityLevel = score >= 90
-        ? "Excellent"
-        : score >= 70
-            ? "Good"
-            : score >= 50
-                ? "Warning"
-                : "Critical";
+  for (final file in files) {
 
-    final recommendation = score >= 90
-        ? "Your device is fully protected."
-        : score >= 70
-            ? "Everything looks good. Keep your apps updated."
-            : score >= 50
-                ? "Some security improvements are recommended!."
-                : "Immediate action is required to protect your device.";
+    final name = file.fileName.toLowerCase();
 
-    return ScanResult(
-      appsScanned: apps,
-      filesChecked: files,
-      threatsFound: threats,
-      protectionScore: score,
-      status: status,
-      securityLevel: securityLevel,
-      recommendation: recommendation,
-      scanTime: DateTime.now(),
-    );
+    // ======================================================
+    // SIMPLE THREAT DETECTION
+    //
+    // Detect executable files and suspicious filenames.
+    //
+    // This is temporary until the AI engine is developed.
+    // ======================================================
+
+    if (name.endsWith(".apk") ||
+        name.endsWith(".exe") ||
+        name.contains("virus") ||
+        name.contains("hack") ||
+        name.contains("trojan")) {
+
+      threats++;
+    }
   }
 
-  // ==========================================================
-  // REAL SCAN
-  // ==========================================================
+  // ========================================================
+  // CALCULATE PROTECTION SCORE
+  // ========================================================
 
-  static Future<ScanResult> performRealScan() async {
+  int score = 100 - (threats * 15);
 
-    // Temporary:
-    // We will replace this with the real scanner next.
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    return performScan();
+  if (score < 40) {
+    score = 40;
   }
 
+  // ========================================================
+  // GENERATE SECURITY STATUS
+  // ========================================================
+
+  final status = threats == 0
+      ? "Your selected folder is secure."
+      : threats == 1
+          ? "1 suspicious file detected."
+          : "$threats suspicious files detected.";
+
+  // ========================================================
+  // DETERMINE SECURITY LEVEL
+  // ========================================================
+
+  final securityLevel = score >= 90
+      ? "Excellent"
+      : score >= 70
+          ? "Good"
+          : score >= 50
+              ? "Warning"
+              : "Critical";
+
+  // ========================================================
+  // GENERATE SECURITY RECOMMENDATION
+  // ========================================================
+
+  final recommendation = threats == 0
+      ? "No suspicious files were found."
+      : "Review or remove suspicious files.";
+
+  // ========================================================
+  // RETURN COMPLETED SCAN RESULT
+  // ========================================================
+
+  return ScanResult(
+    appsScanned: 0,
+    filesChecked: files.length,
+    threatsFound: threats,
+    protectionScore: score,
+    status: status,
+    securityLevel: securityLevel,
+    recommendation: recommendation,
+    scanTime: DateTime.now(),
+  );
+}
 }

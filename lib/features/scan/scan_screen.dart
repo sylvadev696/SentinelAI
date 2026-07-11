@@ -102,7 +102,7 @@ debugPrint("Files found: ${files.length}");
         if (progress >= 1.0) {
           timer.cancel();
 
-          final result = await ScanEngine.performRealScan();
+          final result = await ScanEngine.performRealScan(files);
 
           setState(() {
             progress = 1.0;
