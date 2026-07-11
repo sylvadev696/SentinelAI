@@ -91,43 +91,31 @@ class ScanResult {
   }
 }
 
-// ==========================================================
-// SCAN ENGINE
-//
-// Simulates scanning a device by generating
-// realistic cybersecurity statistics.
-// ==========================================================
-
 class ScanEngine {
+
+  // ==========================================================
+  // SIMULATED SCAN
+  // ==========================================================
+
   static ScanResult performScan() {
     final random = Random();
 
-    // Generate scan statistics.
     final apps = 120 + random.nextInt(81);
     final files = 3000 + random.nextInt(4001);
     final threats = random.nextInt(4);
 
-    // Calculate protection score.
     int score = 100 - (threats * 15);
 
-    if (score < 40) {
-      score = 40;
-    }
+    if (score < 40) score = 40;
 
-    // Determine scan status.
-    String status;
+    final status = threats == 0
+        ? "Your device is secure."
+        : threats == 1
+            ? "Low-risk threat detected."
+            : threats == 2
+                ? "Multiple threats detected."
+                : "Critical security attention required.";
 
-    if (threats == 0) {
-      status = "Your device is secure.";
-    } else if (threats == 1) {
-      status = "Low-risk threat detected.";
-    } else if (threats == 2) {
-      status = "Multiple threats detected.";
-    } else {
-      status = "Critical security attention required.";
-    }
-
-    // Determine security level.
     final securityLevel = score >= 90
         ? "Excellent"
         : score >= 70
@@ -136,16 +124,14 @@ class ScanEngine {
                 ? "Warning"
                 : "Critical";
 
-    // Generate recommendation.
     final recommendation = score >= 90
         ? "Your device is fully protected."
         : score >= 70
             ? "Everything looks good. Keep your apps updated."
             : score >= 50
-                ? "Some security improvements are recommended."
-                : "Immediate action is required to protect this device.";
+                ? "Some security improvements are recommended!."
+                : "Immediate action is required to protect your device.";
 
-    // Return completed scan.
     return ScanResult(
       appsScanned: apps,
       filesChecked: files,
@@ -157,4 +143,19 @@ class ScanEngine {
       scanTime: DateTime.now(),
     );
   }
+
+  // ==========================================================
+  // REAL SCAN
+  // ==========================================================
+
+  static Future<ScanResult> performRealScan() async {
+
+    // Temporary:
+    // We will replace this with the real scanner next.
+
+    await Future.delayed(const Duration(seconds: 2));
+
+    return performScan();
+  }
+
 }

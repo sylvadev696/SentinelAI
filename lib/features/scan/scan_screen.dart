@@ -22,6 +22,13 @@ import 'widgets/scan_report_card.dart';
 import '../../services/latest_scan_service.dart';
 import '../../services/activity_storage_service.dart';
 
+import '../security/services/permission_service.dart';
+import 'dart:io';
+
+import '../security/services/folder_picker_service.dart';
+import '../security/scanners/file_scanner.dart';
+
+
 class ScanScreen extends StatefulWidget {
   const ScanScreen({super.key});
 
@@ -45,6 +52,40 @@ class _ScanScreenState extends State<ScanScreen> {
   // ==========================================================
 
   Future<void> startScan() async {
+   // ==========================================================
+// REQUEST STORAGE PERMISSION
+// ==========================================================
+
+final granted =
+    await PermissionService.requestStoragePermission();
+
+if (!granted) {
+
+  if (!mounted) return;
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text(
+        "Storage permission is required to scan your device.",
+      ),
+    ),
+  );
+
+  return;
+}
+
+// Ask the user to choose a folder
+final folderPath = await FolderPickerService.pickFolder();
+
+if (folderPath == null) {
+  return;
+}
+
+// Scan the selected folder
+final files = await FileScanner.scanDirectory(
+  Directory(folderPath),
+);
+debugPrint("Files found: ${files.length}");
     setState(() {
       isScanning = true;
       progress = 0.0;
@@ -61,7 +102,7 @@ class _ScanScreenState extends State<ScanScreen> {
         if (progress >= 1.0) {
           timer.cancel();
 
-          final result = ScanEngine.performScan();
+          final result = await ScanEngine.performRealScan();
 
           setState(() {
             progress = 1.0;

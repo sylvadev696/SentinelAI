@@ -2,40 +2,37 @@
 // SENTINEL AI
 // File: permission_service.dart
 //
-// Description:
-// Handles all storage permissions required by
-// the Security Engine.
-//
-// Responsibilities:
-//
-// • Check storage permission
-// • Request storage permission
-// • Return permission status
-//
-// Future:
-//
-// • Manage Photos permission
-// • Manage Notification permission
-// • Manage Camera permission
-// • Manage Microphone permission
+// Handles storage permissions for Android.
 //
 // Author: Ab Junior
 // ==========================================================
+
+import 'dart:io';
 
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionService {
 
   // ==========================================================
-  // STORAGE PERMISSION
+  // REQUEST STORAGE PERMISSION
   // ==========================================================
 
   static Future<bool> requestStoragePermission() async {
 
-    final status =
-        await Permission.storage.request();
+    if (Platform.isAndroid) {
 
-    return status.isGranted;
+      // Android 11+
+      if (await Permission.manageExternalStorage.isGranted) {
+        return true;
+      }
+
+      final status =
+          await Permission.manageExternalStorage.request();
+
+      return status.isGranted;
+    }
+
+    return false;
   }
 
   // ==========================================================
@@ -44,7 +41,11 @@ class PermissionService {
 
   static Future<bool> hasStoragePermission() async {
 
-    return await Permission.storage.isGranted;
+    if (Platform.isAndroid) {
+      return await Permission.manageExternalStorage.isGranted;
+    }
+
+    return false;
   }
 
 }
