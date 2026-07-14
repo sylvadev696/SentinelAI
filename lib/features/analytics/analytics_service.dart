@@ -41,20 +41,21 @@ class AnalyticsService {
       );
     }
 
-    int totalApps = 0;
-    int totalFiles = 0;
-    int totalThreats = 0;
-    int totalScore = 0;
+// ==========================================================
+// USE THE MOST RECENT SCAN
+//
+// The newest scan is always stored at index 0.
+// ==========================================================
 
-    for (final scan in history) {
-      totalApps += scan.appsScanned;
-      totalFiles += scan.filesChecked;
-      totalThreats += scan.threatsFound;
-      totalScore += scan.protectionScore;
-    }
+final latest = history.first;
 
-    final averageScore =
-        (totalScore / history.length).round();
+final totalApps = latest.appsScanned;
+
+final totalFiles = latest.filesChecked;
+
+final totalThreats = latest.threatsFound;
+
+final averageScore = latest.protectionScore;
 
     String riskLevel;
 
@@ -83,7 +84,7 @@ class AnalyticsService {
           "Your device has maintained excellent security. No significant threats were detected.";
     } else if (averageScore >= 70) {
       insight =
-          "Your device is protected, but regular scans are recommended.";
+          "Your device is protected, but regular scans are recommended by AI.";
     } else {
       insight =
           "Your device requires immediate security attention.";
