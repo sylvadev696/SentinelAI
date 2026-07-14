@@ -16,6 +16,7 @@
 
 
 import '../security/models/file_information.dart';
+import '../security/engine/threat_detection_engine.dart';
 
 // ==========================================================
 // SCAN RESULT MODEL
@@ -122,86 +123,20 @@ class ScanEngine {
     await Future.delayed(
       const Duration(seconds: 2),
     );
-
-    int threats = 0;
-    int executableFiles = 0;
-
-    // ========================================================
-    // ANALYSE EVERY FILE
-    // ========================================================
-
-    for (final file in files) {
-
-      if (file.isExecutable) {
-        executableFiles++;
-      }
-
-      final name = file.fileName.toLowerCase();
-
-      if (file.isExecutable ||
-          name.contains("virus") ||
-          name.contains("trojan") ||
-          name.contains("hack") ||
-          name.contains("malware")) {
-
-        threats++;
-      }
-    }
-
-    // ========================================================
-    // CALCULATE PROTECTION SCORE
-    // ========================================================
-
-    int score = 100 - (threats * 10);
-
-    if (score < 40) {
-      score = 40;
-    }
-
-    // ========================================================
-    // DETERMINE STATUS
-    // ========================================================
-
-    final status = threats == 0
-        ? "Your device is secure."
-        : threats == 1
-            ? "Low-risk threat detected."
-            : threats <= 5
-                ? "Multiple threats detected."
-                : "Critical security attention required.";
-
-    // ========================================================
-    // DETERMINE SECURITY LEVEL
-    // ========================================================
-
-    final securityLevel = score >= 90
-        ? "Excellent"
-        : score >= 70
-            ? "Good"
-            : score >= 50
-                ? "Warning"
-                : "Critical";
-
-    // ========================================================
-    // RECOMMENDATION
-    // ========================================================
-
-    final recommendation = score >= 90
-        ? "Your device is fully protected."
-        : score >= 70
-            ? "Everything looks good. Keep your apps updated."
-            : score >= 50
-                ? "Some security improvements are recommended."
-                : "Immediate action is required to protect your device.";
-
+//==========================================================
+//ANALYSIS FILES
+//
+//Deligates the analysis of scanned files to the ThreatDetectionEngine.
+//==========================================================
+final analysis = ThreatDetectionEngine.analyse(files);
     return ScanResult(
-      appsScanned: executableFiles,
+      appsScanned: analysis.executableFiles,
       filesChecked: files.length,
-      threatsFound: threats,
-      protectionScore: score,
-      status: status,
-      securityLevel: securityLevel,
-      recommendation: recommendation,
+      threatsFound: analysis.threats,
+      protectionScore: analysis.protectionScore,
+      status: analysis.status,
+      securityLevel: analysis.securityLevel,
+      recommendation: analysis.recommendation,
       scanTime: DateTime.now(),
     );
   }
