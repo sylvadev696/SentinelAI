@@ -95,121 +95,114 @@ class ScanResult {
 class ScanEngine {
 
   // ==========================================================
-  // SIMULATED SCAN
+  // REAL FILE SCAN
+  //
+  // Performs a real scan using the files selected by
+  // the user.
+  //
+  // Current detection:
+  //
+  // • Counts every scanned file
+  // • Counts executable files
+  // • Detects suspicious filenames
+  //
+  // Future improvements:
+  //
+  // • SHA-256 hashing
+  // • Malware signature database
+  // • AI threat classification
+  // • Ransomware detection
+  // • Cloud reputation lookup
   // ==========================================================
 
- // ==========================================================
-// REAL FILE SCAN
-//
-// Performs a real scan using the files selected by
-// the user.
-//
-// Current detection:
-//
-// • Counts every scanned file
-// • Detects executable files
-// • Detects suspicious filenames
-//
-// Future improvements:
-//
-// • SHA-256 hashing
-// • Malware signature database
-// • AI threat classification
-// • Ransomware detection
-// • Cloud reputation lookup
-// ==========================================================
+  static Future<ScanResult> performRealScan(
+    List<FileInformation> files,
+  ) async {
 
-static Future<ScanResult> performRealScan(
-  List<FileInformation> files,
-) async {
+    await Future.delayed(
+      const Duration(seconds: 2),
+    );
 
-  // ========================================================
-  // THREAT COUNTER
-  //
-  // Counts how many suspicious files are found.
-  // ========================================================
+    int threats = 0;
+    int executableFiles = 0;
 
-  int threats = 0;
+    // ========================================================
+    // ANALYSE EVERY FILE
+    // ========================================================
 
-  // ========================================================
-  // ANALYZE EVERY FILE
-  // ========================================================
+    for (final file in files) {
 
-  for (final file in files) {
+      if (file.isExecutable) {
+        executableFiles++;
+      }
 
-    final name = file.fileName.toLowerCase();
+      final name = file.fileName.toLowerCase();
 
-    // ======================================================
-    // SIMPLE THREAT DETECTION
-    //
-    // Detect executable files and suspicious filenames.
-    //
-    // This is temporary until the AI engine is developed.
-    // ======================================================
+      if (file.isExecutable ||
+          name.contains("virus") ||
+          name.contains("trojan") ||
+          name.contains("hack") ||
+          name.contains("malware")) {
 
-    if (name.endsWith(".apk") ||
-        name.endsWith(".exe") ||
-        name.contains("virus") ||
-        name.contains("hack") ||
-        name.contains("trojan")) {
-
-      threats++;
+        threats++;
+      }
     }
+
+    // ========================================================
+    // CALCULATE PROTECTION SCORE
+    // ========================================================
+
+    int score = 100 - (threats * 10);
+
+    if (score < 40) {
+      score = 40;
+    }
+
+    // ========================================================
+    // DETERMINE STATUS
+    // ========================================================
+
+    final status = threats == 0
+        ? "Your device is secure."
+        : threats == 1
+            ? "Low-risk threat detected."
+            : threats <= 5
+                ? "Multiple threats detected."
+                : "Critical security attention required.";
+
+    // ========================================================
+    // DETERMINE SECURITY LEVEL
+    // ========================================================
+
+    final securityLevel = score >= 90
+        ? "Excellent"
+        : score >= 70
+            ? "Good"
+            : score >= 50
+                ? "Warning"
+                : "Critical";
+
+    // ========================================================
+    // RECOMMENDATION
+    // ========================================================
+
+    final recommendation = score >= 90
+        ? "Your device is fully protected."
+        : score >= 70
+            ? "Everything looks good. Keep your apps updated."
+            : score >= 50
+                ? "Some security improvements are recommended."
+                : "Immediate action is required to protect your device.";
+
+    return ScanResult(
+      appsScanned: executableFiles,
+      filesChecked: files.length,
+      threatsFound: threats,
+      protectionScore: score,
+      status: status,
+      securityLevel: securityLevel,
+      recommendation: recommendation,
+      scanTime: DateTime.now(),
+    );
   }
-
-  // ========================================================
-  // CALCULATE PROTECTION SCORE
-  // ========================================================
-
-  int score = 100 - (threats * 15);
-
-  if (score < 40) {
-    score = 40;
-  }
-
-  // ========================================================
-  // GENERATE SECURITY STATUS
-  // ========================================================
-
-  final status = threats == 0
-      ? "Your selected folder is secure."
-      : threats == 1
-          ? "1 suspicious file detected."
-          : "$threats suspicious files detected.";
-
-  // ========================================================
-  // DETERMINE SECURITY LEVEL
-  // ========================================================
-
-  final securityLevel = score >= 90
-      ? "Excellent"
-      : score >= 70
-          ? "Good"
-          : score >= 50
-              ? "Warning"
-              : "Critical";
-
-  // ========================================================
-  // GENERATE SECURITY RECOMMENDATION
-  // ========================================================
-
-  final recommendation = threats == 0
-      ? "No suspicious files were found."
-      : "Review or remove suspicious files.";
-
-  // ========================================================
-  // RETURN COMPLETED SCAN RESULT
-  // ========================================================
-
-  return ScanResult(
-    appsScanned: 0,
-    filesChecked: files.length,
-    threatsFound: threats,
-    protectionScore: score,
-    status: status,
-    securityLevel: securityLevel,
-    recommendation: recommendation,
-    scanTime: DateTime.now(),
-  );
-}
 }
