@@ -10,14 +10,18 @@
 // ==========================================================
 
 import '../models/file_information.dart';
+import '../models/threat_report.dart';
 
 class ThreatDetectionResult {
   final int threats;
   final int executableFiles;
   final int protectionScore;
+
   final String securityLevel;
   final String status;
   final String recommendation;
+  
+  final List<ThreatReport> threatReports;
 
   const ThreatDetectionResult({
     required this.threats,
@@ -26,6 +30,7 @@ class ThreatDetectionResult {
     required this.securityLevel,
     required this.status,
     required this.recommendation,
+    required this.threatReports,
   });
 }
 
@@ -35,6 +40,7 @@ class ThreatDetectionEngine {
   ) {
     int threats = 0;
     int executableFiles = 0;
+    final List<ThreatReport> reports = [];
 
     for (final file in files) {
       final name = file.fileName.toLowerCase();
@@ -43,13 +49,41 @@ class ThreatDetectionEngine {
         executableFiles++;
       }
 
-      if (file.isExecutable ||
-          name.contains("virus") ||
-          name.contains("trojan") ||
-          name.contains("hack") ||
-          name.contains("malware")) {
-        threats++;
-      }
+    String? reason;
+
+if (file.isExecutable) {
+  reason = "Executable file";
+}
+
+if (name.contains("virus")) {
+  reason = "Suspicious filename (virus)";
+}
+
+if (name.contains("trojan")) {
+  reason = "Suspicious filename (trojan)";
+}
+
+if (name.contains("hack")) {
+  reason = "Suspicious filename (hack)";
+}
+
+if (name.contains("malware")) {
+  reason = "Suspicious filename (malware)";
+}
+
+if (reason != null) {
+
+  threats++;
+
+  reports.add(
+    ThreatReport(
+      fileName: file.fileName,
+      filePath: file.filePath,
+      reason: reason,
+      severity: "Medium",
+    ),
+  );
+}  
     }
 
     int score = 100 - (threats * 10);
@@ -89,6 +123,7 @@ class ThreatDetectionEngine {
       securityLevel: securityLevel,
       status: status,
       recommendation: recommendation,
+      threatReports: reports,
     );
   }
 }
