@@ -86,6 +86,13 @@ final files = await FileScanner.scanDirectory(
   Directory(folderPath),
 );
 debugPrint("Files found: ${files.length}");
+
+for (final file in files) {
+  debugPrint(
+    "FILE: ${file.fileName} | Executable: ${file.isExecutable}",
+  );
+}
+
     setState(() {
       isScanning = true;
       progress = 0.0;

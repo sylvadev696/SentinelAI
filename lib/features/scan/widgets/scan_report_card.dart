@@ -10,6 +10,7 @@
 import 'protection_score_gauge.dart';
 import 'package:flutter/material.dart';
 import '../scan_engine.dart';
+import '../../security/screens/threat_details_screen.dart'; 
 
 class ScanReportCard extends StatelessWidget {
   final ScanResult scanResult;
@@ -103,6 +104,32 @@ const SizedBox(height: 20),
               title: const Text("Last Scan"),
               subtitle: Text(scanResult.scanTime.toString()),
             ),
+            if (scanResult.threatsFound > 0) ...[
+  const SizedBox(height: 20),
+
+  SizedBox(
+    width: double.infinity,
+    child: ElevatedButton.icon(
+      icon: const Icon(Icons.security),
+      label: const Text("View Threat Details"),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF0B3D91),
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ThreatDetailsScreen(
+              reports: scanResult.reports,
+            ),
+          ),
+        );
+      },
+    ),
+  ),
+],
               
       
           ],
