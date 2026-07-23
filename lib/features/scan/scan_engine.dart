@@ -16,6 +16,7 @@
 
 
 import '../security/models/file_information.dart';
+import '../security/models/threat_report.dart';
 import '../security/engine/threat_detection_engine.dart';
 
 // ==========================================================
@@ -36,7 +37,8 @@ class ScanResult {
   final String status;
   final String securityLevel;
   final String recommendation;
-  final DateTime scanTime;
+  final List<ThreatReport> reports;
+  final DateTime scanTime;  
 
   ScanResult({
     required this.appsScanned,
@@ -46,7 +48,9 @@ class ScanResult {
     required this.status,
     required this.securityLevel,
     required this.recommendation,
+    required this.reports,
     required this.scanTime,
+    
   });
 
   // ==========================================================
@@ -57,42 +61,57 @@ class ScanResult {
   // ==========================================================
 
   Map<String, dynamic> toMap() {
-    return {
-      "appsScanned": appsScanned,
-      "filesChecked": filesChecked,
-      "threatsFound": threatsFound,
-      "protectionScore": protectionScore,
-      "status": status,
-      "securityLevel": securityLevel,
-      "recommendation": recommendation,
-      "scanTime": scanTime.toIso8601String(),
-    };
-  }
+  return {
+    "appsScanned": appsScanned,
+    "filesChecked": filesChecked,
+    "threatsFound": threatsFound,
+    "protectionScore": protectionScore,
+    "status": status,
+    "securityLevel": securityLevel,
+    "recommendation": recommendation,
 
+    "reports": reports
+        .map((report) => report.toMap())
+        .toList(),
+
+    "scanTime": scanTime.toIso8601String(),
+  };
+}
   // ==========================================================
   // CREATE FROM MAP
   //
   // Reconstructs a ScanResult from stored data.
   // ==========================================================
 
-  factory ScanResult.fromMap(
-    Map<String, dynamic> map,
-  ) {
-    return ScanResult(
-      appsScanned: map["appsScanned"] as int,
-      filesChecked: map["filesChecked"] as int,
-      threatsFound: map["threatsFound"] as int,
-      protectionScore: map["protectionScore"] as int,
-      status: map["status"] as String,
-      securityLevel: map["securityLevel"] as String,
-      recommendation: map["recommendation"] as String,
-      scanTime: DateTime.parse(
-        map["scanTime"] as String,
-      ),
-    );
-  }
-}
+ factory ScanResult.fromMap(
+  Map<String, dynamic> map,
+) {
+  final reportsData =
+      map["reports"] as List<dynamic>? ?? [];
 
+  return ScanResult(
+    appsScanned: map["appsScanned"] as int,
+    filesChecked: map["filesChecked"] as int,
+    threatsFound: map["threatsFound"] as int,
+    protectionScore: map["protectionScore"] as int,
+    status: map["status"] as String,
+    securityLevel: map["securityLevel"] as String,
+    recommendation: map["recommendation"] as String,
+
+    reports: reportsData
+        .map(
+          (item) => ThreatReport.fromMap(
+            Map<String, dynamic>.from(item),
+          ),
+        )
+        .toList(),
+
+    scanTime: DateTime.parse(
+      map["scanTime"] as String,
+    ),
+  );
+}
+}
 class ScanEngine {
 
   // ==========================================================
@@ -128,7 +147,7 @@ class ScanEngine {
 //
 //Deligates the analysis of scanned files to the ThreatDetectionEngine.
 //==========================================================
-final analysis = ThreatDetectionEngine.analyse(files);
+final analysis = await ThreatDetectionEngine.analyse(files);
     return ScanResult(
       appsScanned: analysis.executableFiles,
       filesChecked: files.length,
@@ -137,6 +156,7 @@ final analysis = ThreatDetectionEngine.analyse(files);
       status: analysis.status,
       securityLevel: analysis.securityLevel,
       recommendation: analysis.recommendation,
+      reports: analysis.threatReports,
       scanTime: DateTime.now(),
     );
   }

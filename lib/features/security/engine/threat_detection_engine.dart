@@ -9,8 +9,11 @@
 // Author: Ab Junior
 // ==========================================================
 
+import 'dart:io';
+
 import '../models/file_information.dart';
 import '../models/threat_report.dart';
+import 'hash_engine.dart';
 
 class ThreatDetectionResult {
   final int threats;
@@ -20,7 +23,7 @@ class ThreatDetectionResult {
   final String securityLevel;
   final String status;
   final String recommendation;
-  
+
   final List<ThreatReport> threatReports;
 
   const ThreatDetectionResult({
@@ -35,11 +38,12 @@ class ThreatDetectionResult {
 }
 
 class ThreatDetectionEngine {
-  static ThreatDetectionResult analyse(
+  static Future<ThreatDetectionResult> analyse(
     List<FileInformation> files,
-  ) {
+  ) async {
     int threats = 0;
     int executableFiles = 0;
+
     final List<ThreatReport> reports = [];
 
     for (final file in files) {
@@ -49,41 +53,51 @@ class ThreatDetectionEngine {
         executableFiles++;
       }
 
-    String? reason;
+      String? reason;
 
-if (file.isExecutable) {
-  reason = "Executable file";
-}
+      if (file.isExecutable) {
+        reason = "Executable file";
+      }
 
-if (name.contains("virus")) {
-  reason = "Suspicious filename (virus)";
-}
+      if (name.contains("virus")) {
+        reason = "Suspicious filename (virus)";
+      }
 
-if (name.contains("trojan")) {
-  reason = "Suspicious filename (trojan)";
-}
+      if (name.contains("trojan")) {
+        reason = "Suspicious filename (trojan)";
+      }
 
-if (name.contains("hack")) {
-  reason = "Suspicious filename (hack)";
-}
+      if (name.contains("hack")) {
+        reason = "Suspicious filename (hack)";
+      }
 
-if (name.contains("malware")) {
-  reason = "Suspicious filename (malware)";
-}
+      if (name.contains("malware")) {
+        reason = "Suspicious filename (malware)";
+      }
 
-if (reason != null) {
+      if (reason != null) {
+        threats++;
 
-  threats++;
+        String sha256 = "";
 
-  reports.add(
-    ThreatReport(
-      fileName: file.fileName,
-      filePath: file.filePath,
-      reason: reason,
-      severity: "Medium",
-    ),
-  );
-}  
+        try {
+          sha256 = await HashEngine.generateSHA256(
+            File(file.filePath),
+          );
+        } catch (_) {
+          sha256 = "HASH_FAILED";
+        }
+
+        reports.add(
+          ThreatReport(
+            fileName: file.fileName,
+            filePath: file.filePath,
+            reason: reason,
+            severity: "Medium",
+            sha256: sha256,
+          ),
+        );
+      }
     }
 
     int score = 100 - (threats * 10);
